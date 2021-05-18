@@ -10,7 +10,7 @@ Authors@R: c(person("Emmanuel", "Sikali", role=c("aut", "pdr"), email = "Emmanue
 Maintainer: Paul Bailey <pbailey@air.org>
 Description: Calculates Pearson, Spearman, polychoric, and polyserial correlation coefficients, in weighted or unweighted form. The package implements tetrachoric correlation as a special case of the polychoric and biserial correlation as a specific case of the polyserial.
 License: GPL-2
-BugReports: https://github.com/ahmademad/wCorr/issues
+BugReports: https://github.com/American-Institutes-for-Research/wCorr
 Note: This publication was prepared for NCES under Contract No.
         ED-IES-12-D-0002 with the American Institutes for Research.
         Mention of trade names, commercial products, or organizations
