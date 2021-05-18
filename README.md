@@ -6,6 +6,8 @@
 <!-- badges: start -->
 
 [![CRAN
+status](https://www.r-pkg.org/badges/version-ago/wCorr)](https://www.r-pkg.org/badges/version-ago/wCorr)
+[![CRAN
 status](https://cranlogs.r-pkg.org/badges/wCorr)](https://cranlogs.r-pkg.org/badges/wCorr)
 [![CRAN
 status](https://cranlogs.r-pkg.org/badges/grand-total/wCorr)](https://cranlogs.r-pkg.org/badges/grand-total/wCorr)
