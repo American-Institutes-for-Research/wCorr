@@ -1,7 +1,7 @@
 Package: wCorr
 Type: Package
 Title: Weighted Correlations
-Version: 1.9.0
+Version: 1.9.2
 Date: 2017-05-15
 Authors@R: c(person("Emmanuel", "Sikali", role=c("aut", "pdr"), email = "Emmanuel.Sikali@ed.gov"), 
           person("Ahmad", "Emad", role="aut"), 
