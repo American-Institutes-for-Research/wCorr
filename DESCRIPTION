@@ -3,7 +3,7 @@ Type: Package
 Title: Weighted Correlations
 Version: 1.9.2
 Date: 2017-05-15
-Authors@R: c(person("Emmanuel", "Sikali", role=c("aut", "pdr"), email = "Emmanuel.Sikali@ed.gov"), 
+Authors@R: c(person("Emmanuel", "Sikali", role=c("pdr"), email = "Emmanuel.Sikali@ed.gov"), 
           person("Ahmad", "Emad", role="aut"), 
           person("Paul", "Bailey", role = "aut", email="pbailey@air.org"),
           person("Eric", "Buehler", role="ctb"))
