@@ -55,7 +55,7 @@ par(mgp=c(3,1,0))
 title(xlab="Y")
 par(par0)
 
-## ----bias Versus rho, echo=FALSE,fig.width=7, fig.height=5--------------------
+## ----biasVersusrho, echo=FALSE,fig.width=7, fig.height=5----------------------
 #bias$rmse <- sqrt( (bias$est - bias$rho)^2 )
 #bias$bias <- bias$est - bias$rho
 #aggbias <- summaryBy(bias + rmse  ~ n + rho + type, data=bias, FUN=mean, na.rm=TRUE)

@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">wCorr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.9.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.9.3</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@
 
       
 
-      </header><script src="wCorrFormulas_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="wCorrFormulas_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>wCorr Formulas</h1>
@@ -197,7 +197,7 @@
 <p><span class="math display">\[bias=\frac{1}{n}\sum_{i=1}^n \left(r_i - \rho_i \right)\]</span></p>
 <p>Figure 2 shows the bias as a function of the true correlation <span class="math inline">\(\rho\)</span>. Only the polyserial shows no bias at any level of <span class="math inline">\(n\)</span>, shown by no clear deviation from 0 at any level of <span class="math inline">\(\rho\)</span>. For the Pearson correlation there is bias when <span class="math inline">\(n=10\)</span> that is not present when <span class="math inline">\(n=100\)</span> or 1,000. This is a well known property of the estimator.<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a> Similarly, the polychoric shows bias when <span class="math inline">\(n=10\)</span>.</p>
 <p>The Spearman correlation shows bias at all of the tested levels of <span class="math inline">\(n\)</span>. The bias is zero when the true correlation is 1, 0, or -1; is positive when <span class="math inline">\(\rho\)</span> is below 0 (negative correlation); and is negative when <span class="math inline">\(\rho\)</span> is above 0 (positive correlation). In this section, the Spearman correlation coefficient is compared with the true Pearson correlation coefficient. When this is done, the bias is expected because the Spearman correlation is not intended to recover a Pearson type correlation coefficient; it is designed to measure a separate quantity.</p>
-<p><strong>Figure 2.</strong> <em>Bias Versus <span class="math inline">\(\rho\)</span> for Unweighted Correlations.</em><br><img src="wCorrFormulas_files/figure-html/bias%20Versus%20rho-1.png" width="672"></p>
+<p><strong>Figure 2.</strong> <em>Bias Versus <span class="math inline">\(\rho\)</span> for Unweighted Correlations.</em><br><img src="wCorrFormulas_files/figure-html/biasVersusrho-1.png" width="672"></p>
 <div style="page-break-after: always;"></div>
 <p>Figure 3 shows the RMSE as a function of <span class="math inline">\(\rho\)</span>. All of the correlation coefficients have a uniform RMSE as a function of <span class="math inline">\(\rho\)</span> near <span class="math inline">\(\rho=0\)</span> that decreases near <span class="math inline">\(|\rho|=1\)</span>. All plots also show a decrease in RMSE as <span class="math inline">\(n\)</span> increases. This plot shows that there is no appreciable RMSE differences as a functions of <span class="math inline">\(\rho\)</span>. In addition, it show that our attention to the MLE correlation of -1 or 1 at edge cases did not make the RMSE much worse in the neighborhood of the edges (<span class="math inline">\(|\rho| \sim 1\)</span>).</p>
 <p><strong>Figure 3.</strong> <em>Root Mean Square Error Versus <span class="math inline">\(\rho\)</span> for Unweighted Correlations.</em><br><img src="wCorrFormulas_files/figure-html/rmse%20Versus%20rho-1.png" width="672"></p>
@@ -274,7 +274,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Ahmad Emad, Paul Bailey.</p>
+  <p>Developed by Paul Bailey, Ahmad Emad.</p>
 </div>
 
 <div class="pkgdown">
