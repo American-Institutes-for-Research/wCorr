@@ -273,7 +273,7 @@ xyplot(bias.mean ~ rho|type,
 
 
 **`r fig_nums("rmseVsRho", display="cite")`.** *Root Mean Square Error Versus $\rho$ for Unweighted Correlations.*   
-```{r rmse Versus rho, echo=FALSE,fig.width=7, fig.height=3.5}
+```{r rmseVersusrho, echo=FALSE,fig.width=7, fig.height=3.5}
 xyplot(rmse.mean ~ rho|type,
       data=aggbias,
       groups=n,

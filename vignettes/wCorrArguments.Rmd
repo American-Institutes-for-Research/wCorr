@@ -135,7 +135,7 @@ A simulation was done using the Cartesian product (all possible combinations of)
 \newpage
 
 **`r fig_nums("MLRMSE", display="cite")`.** *Root Mean Square Error for `ML=TRUE` and `ML=FALSE`.*  
-```{r ML RMSE plot, echo=FALSE,fig.width=7, fig.height=5.5}
+```{r MLRMSEplot, echo=FALSE,fig.width=7, fig.height=5.5}
 #ml <- subset(ML, type %in% c("Polychoric", "Polyserial"))
 #ml$rmse <- (ml$est - ml$rho)^2
 
