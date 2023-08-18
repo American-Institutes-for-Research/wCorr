@@ -1,24 +1,52 @@
 ## ----packages and data, echo=FALSE, results="hide", message=FALSE,warning=FALSE----
+if(!requireNamespace("knitr")) {
+  stop("Cannot build vignette without knitr package")
+}
+if(!requireNamespace("lattice")) {
+  stop("Cannot build vignette without lattice package")
+}
 require(knitr)
 require(wCorr)
 require(lattice)
-require(captioner)
 
 # set layout so a figure label appears to go with the figure
 trellis.device()
 trellis.par.set(list(layout.widths  = list(left.padding = 3, right.padding = 3),
                      layout.heights = list(top.padding = -1, bottom.padding = 3))) 
-##load("../vignettes/sim/ML.RData")
-#load("../vignettes/sim/aggML.RData")
-#load("../vignettes/sim/fast.RData")
-#load("../vignettes/sim/speed.RData")
-
-#load("aggML.RData")
-#load("fast.RData")
-#load("speed.RData")
 load("../R/sysdata.rda")
 
 ## ----setup fast, echo=FALSE, results="hide", message=FALSE, warning=FALSE-----
+# replicate captioner functionality we used to use
+cp <- function(prefix="Figure") {
+  pf <- prefix
+  cw <- data.frame(name="__XX__UNUSED", print="Table 99")
+  i <- 1
+  function(x, display=c("save", "cite", "cw")) {
+    if(display[1] %in% "cw") {
+      return(cw)
+    }
+    display <- match.arg(display)
+    if(is.null(x)) {
+      stop("must define argument x")
+    }
+    if(display %in% "cite" && !x %in% cw$name) {
+      display <- "save"
+    }
+    if(display %in% "cite") {
+      return(cw$print[cw$name == x])
+    }
+    if(display %in% "save") {
+      if(x %in% cw$name) {
+        stop("Label:",dQuote(x)," already in use.")
+      }  
+      cw[i, "name"] <<- x
+      res <- paste(pf, i, ":")
+      cw[i, "print"] <<- res
+      i <<- i + 1
+      return(res)
+    }
+  }
+}
 # fast$i <- rep(1:(nrow(fast)/2),each=2)
 # mfast <- merge(subset(fast,fast),
 #                subset(fast,!fast, c("i", "est")),
@@ -31,16 +59,16 @@ fmax <- max(aggfast$absdrho.mean)
 fmax10 <- ceiling(log10(fmax))
 
 ## ----tables and figures, echo=FALSE, results="hide", message=FALSE,warning=FALSE----
-fig_nums <- captioner()
-table_nums <- captioner(prefix = "Table")
+fig_nums <- cp()
+table_nums <- cp(prefix = "Table")
 
-MLRMSE <- fig_nums("MLRMSE", "")
-Polychoric <- table_nums("Polychoric", "")
-Polyserial <- table_nums("Polyserial", "")
-fastMAD <- table_nums("fastMAD", "")
-speedi <- table_nums("speedi", "")
+MLRMSE <- fig_nums("MLRMSE")
+Polychoric <- table_nums("Polychoric")
+Polyserial <- table_nums("Polyserial")
+fastMAD <- table_nums("fastMAD")
+speedi <- table_nums("speedi")
 
-## ----ML RMSE plot, echo=FALSE,fig.width=7, fig.height=5.5---------------------
+## ----MLRMSEplot, echo=FALSE,fig.width=7, fig.height=5.5-----------------------
 #ml <- subset(ML, type %in% c("Polychoric", "Polyserial"))
 #ml$rmse <- (ml$est - ml$rho)^2
 

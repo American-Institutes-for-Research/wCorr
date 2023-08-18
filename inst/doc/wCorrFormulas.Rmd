@@ -15,40 +15,56 @@ vignette: |
 require(wCorr)
 require(lattice)
 require(doBy)
-require(captioner)
 # set layout so a figure label appears to go with the figure
 trellis.device()
 trellis.par.set(list(layout.widths  = list(left.padding = 3, right.padding = 3),
                      layout.heights = list(top.padding = -1, bottom.padding = 3)))
-#load("..//vignettes/sim/ntime.RData")
-##load("..//vignettes/sim/bias.RData")
-#load("..//vignettes/sim/aggbias.RData")
-#load("..//vignettes/sim/wgtvrho.RData")
-#load("..//vignettes/sim/wgtvn.RData")
-#load("..//vignettes/sim/spear.RData")
-
-# load("ntime.RData")
-# load("aggbias.RData")
-# load("wgtvrho.RData")
-# load("wgtvn.RData")
-# load("spear.RData")
 load("../R/sysdata.rda")
-
-
 ```
 
 
-```{r tables and figures, echo=FALSE, results="hide", message=FALSE,warning=FALSE}
-fig_nums <- captioner()
-table_nums <- captioner(prefix = "Table")
+```{r tables and figures, echo=FALSE, results="hide", message=FALSE, warning=FALSE}
+# replicate captioner functionality we used to use
+cp <- function(prefix="Figure") {
+  pf <- prefix
+  cw <- data.frame(name="__XX__UNUSED", print="Table 99")
+  i <- 1
+  function(x, display=c("save", "cite", "cw")) {
+    if(display[1] %in% "cw") {
+      return(cw)
+    }
+    display <- match.arg(display)
+    if(is.null(x)) {
+      stop("must define argument x")
+    }
+    if(display %in% "cite" && !x %in% cw$name) {
+      display <- "save"
+    }
+    if(display %in% "cite") {
+      return(cw$print[cw$name == x])
+    }
+    if(display %in% "save") {
+      if(x %in% cw$name) {
+        stop("Label:",dQuote(x)," already in use.")
+      }  
+      cw[i, "name"] <<- x
+      res <- paste(pf, i, ":")
+      cw[i, "print"] <<- res
+      i <<- i + 1
+      return(res)
+    }
+  }
+}
+fig_nums <- cp()
+table_nums <- cp(prefix = "Table")
 
-theta <- fig_nums("theta", "")
-biasVsRho <- table_nums("biasVsRho", "")
-rmseVsRho <- table_nums("rmseVsRho", "")
-rmseVsRho2 <- table_nums("rmseVsN", "")
-speedi <- table_nums("speedi", "")
-rmseVsRho3 <- table_nums("rmseVsRho2", "")
-rmseVsN <- table_nums("rmseVsN2", "")
+theta <- fig_nums("theta")
+biasVsRho <- fig_nums("biasVsRho")
+rmseVsRho <- table_nums("rmseVsRho")
+rmseVsRho2 <- table_nums("rmseVsN")
+speedi <- table_nums("speedi")
+rmseVsRho3 <- table_nums("rmseVsRho2")
+rmseVsN <- table_nums("rmseVsN2")
 ```
 
 The wCorr package can be used to calculate Pearson, Spearman, polyserial, and polychoric correlations, in weighted or unweighted form.^[The estimation procedure used by the wCorr package for the polyserial is based on the likelihood function in  Cox, N. R. (1974), "Estimation of the Correlation between a Continuous and a Discrete Variable." *Biometrics*, **30** (1), pp 171-178. The likelihood function for polychoric is from Olsson, U. (1979) "Maximum Likelihood Estimation of the Polychoric Correlation Coefficient." *Psyhometrika*, **44** (4), pp 443-460. The likelihood used for Pearson and Spearman is written down in many places. One is the "correlate" function in Stata Corp, Stata Statistical Software: Release 8. College Station, TX: Stata Corp LP, 2003.] The package implements the tetrachoric correlation as a specific case of the polychoric correlation and biserial correlation as a specific case of the polyserial correlation. When weights are used, the correlation coefficients are calculated with so called sample weights or inverse probability weights.^[Sample weights are comparable to `pweight` in Stata.]
@@ -130,6 +146,15 @@ $$m_i= \begin{cases} 1 \quad \mathrm{if}  \theta_2 < y_i < \theta_3 \\ 2 \quad \
 where $\theta$ indicates the cut points used to discretize ***Y*** into ***M***, and $t$ is the number of bins. For notational convenience, $\theta_2 \equiv -\infty$ and $\theta_{t+2} \equiv \infty$.^[The indexing is somewhat odd to be consistent with Cox (1974). Nevertheless, this treatment does not use the Cox definition of $\theta_0$, $\theta_1$ or $\theta_2$ which are either not estimated (as is the case for $\theta_0$, and $\theta_1$) or are reappropriated (as is the case for $\theta_2$). Cox calls the correlation coefficient $\theta_2$ while this document uses $\rho$ and uses $\theta_2$ to store $-\infty$ as a convenience so that the vector $\boldsymbol{\theta}$ includes the (infinite) bounds as well as the interior points.]
 
 To give a concrete example, the following figure shows the density of ***Y*** when the cuts points are, for this example, $\theta=\left(-\infty,-2,-0.5,1.6,\infty\right)$. In this example, any value of $-2 < y_i < -0.5$ would have $m_i=2$.
+
+
+
+**`r fig_nums("theta", display="cite")`.** *Density of Y for cutpoints $\theta = (-\infty, -2, -0.5, 1.6, \infty$).*    
+```{r theta2,echo=FALSE,results="hide",fig.width=7, fig.height=3}
+#hi
+```
+hi
+
 
 **`r fig_nums("theta", display="cite")`.** *Density of Y for cutpoints $\theta = (-\infty, -2, -0.5, 1.6, \infty$).*    
 ```{r theta,echo=FALSE,results="hide",fig.width=7, fig.height=3}
@@ -273,7 +298,7 @@ xyplot(bias.mean ~ rho|type,
 
 
 **`r fig_nums("rmseVsRho", display="cite")`.** *Root Mean Square Error Versus $\rho$ for Unweighted Correlations.*   
-```{r rmse Versus rho, echo=FALSE,fig.width=7, fig.height=3.5}
+```{r rmseVersusrho, echo=FALSE,fig.width=7, fig.height=3.5}
 xyplot(rmse.mean ~ rho|type,
       data=aggbias,
       groups=n,

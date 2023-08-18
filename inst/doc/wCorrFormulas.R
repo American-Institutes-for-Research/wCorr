@@ -2,38 +2,57 @@
 require(wCorr)
 require(lattice)
 require(doBy)
-require(captioner)
 # set layout so a figure label appears to go with the figure
 trellis.device()
 trellis.par.set(list(layout.widths  = list(left.padding = 3, right.padding = 3),
                      layout.heights = list(top.padding = -1, bottom.padding = 3)))
-#load("..//vignettes/sim/ntime.RData")
-##load("..//vignettes/sim/bias.RData")
-#load("..//vignettes/sim/aggbias.RData")
-#load("..//vignettes/sim/wgtvrho.RData")
-#load("..//vignettes/sim/wgtvn.RData")
-#load("..//vignettes/sim/spear.RData")
-
-# load("ntime.RData")
-# load("aggbias.RData")
-# load("wgtvrho.RData")
-# load("wgtvn.RData")
-# load("spear.RData")
 load("../R/sysdata.rda")
 
+## ----tables and figures, echo=FALSE, results="hide", message=FALSE, warning=FALSE----
+# replicate captioner functionality we used to use
+cp <- function(prefix="Figure") {
+  pf <- prefix
+  cw <- data.frame(name="__XX__UNUSED", print="Table 99")
+  i <- 1
+  function(x, display=c("save", "cite", "cw")) {
+    if(display[1] %in% "cw") {
+      return(cw)
+    }
+    display <- match.arg(display)
+    if(is.null(x)) {
+      stop("must define argument x")
+    }
+    if(display %in% "cite" && !x %in% cw$name) {
+      display <- "save"
+    }
+    if(display %in% "cite") {
+      return(cw$print[cw$name == x])
+    }
+    if(display %in% "save") {
+      if(x %in% cw$name) {
+        stop("Label:",dQuote(x)," already in use.")
+      }  
+      cw[i, "name"] <<- x
+      res <- paste(pf, i, ":")
+      cw[i, "print"] <<- res
+      i <<- i + 1
+      return(res)
+    }
+  }
+}
+fig_nums <- cp()
+table_nums <- cp(prefix = "Table")
 
+theta <- fig_nums("theta")
+biasVsRho <- fig_nums("biasVsRho")
+rmseVsRho <- table_nums("rmseVsRho")
+rmseVsRho2 <- table_nums("rmseVsN")
+speedi <- table_nums("speedi")
+rmseVsRho3 <- table_nums("rmseVsRho2")
+rmseVsN <- table_nums("rmseVsN2")
 
-## ----tables and figures, echo=FALSE, results="hide", message=FALSE,warning=FALSE----
-fig_nums <- captioner()
-table_nums <- captioner(prefix = "Table")
-
-theta <- fig_nums("theta", "")
-biasVsRho <- table_nums("biasVsRho", "")
-rmseVsRho <- table_nums("rmseVsRho", "")
-rmseVsRho2 <- table_nums("rmseVsN", "")
-speedi <- table_nums("speedi", "")
-rmseVsRho3 <- table_nums("rmseVsRho2", "")
-rmseVsN <- table_nums("rmseVsN2", "")
+## ----theta2,echo=FALSE,results="hide",fig.width=7, fig.height=3---------------
+#hi
 
 ## ----theta,echo=FALSE,results="hide",fig.width=7, fig.height=3----------------
 x <- seq(-3,3,by=0.01) 
@@ -70,7 +89,7 @@ xyplot(bias.mean ~ rho|type,
       auto.key=list(lines=TRUE, points=FALSE, space="right", cex=0.7),
       par.settings=list(superpose.line=list(lwd=2), plot.line=list(lwd=2)))
 
-## ----rmse Versus rho, echo=FALSE,fig.width=7, fig.height=3.5------------------
+## ----rmseVersusrho, echo=FALSE,fig.width=7, fig.height=3.5--------------------
 xyplot(rmse.mean ~ rho|type,
       data=aggbias,
       groups=n,

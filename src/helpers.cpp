@@ -1,3 +1,4 @@
+#define STRICT_R_HEADERS
 #include <RcppArmadillo.h>
 #include <Rmath.h>
 // [[Rcpp::depends("RcppArmadillo")]]
@@ -127,4 +128,3 @@ arma::field<arma::vec> mainF(const arma::vec& x, const arma::vec& M, arma::vec  
     return F;
 
 }
-

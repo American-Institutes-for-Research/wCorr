@@ -1,4 +1,5 @@
-reference:
-- title: Functions
-  contents:
-  - weightedCorr 
+pandoc: 3.1.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+last_built: 2023-07-18T13:50Z
+

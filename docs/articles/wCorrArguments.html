@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,23 +33,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">wCorr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.9.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.7</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -64,7 +60,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/American-Institutes-for-Research/wCorr/">
+  <a href="https://github.com/American-Institutes-for-Research/wCorr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -79,88 +75,229 @@
 
       
 
-      </header><script src="wCorrArguments_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>wCorr Arguments</h1>
-                        <h4 class="author">Paul Bailey, Ahmad Emad, Ting Zhang, Qingshu Xie</h4>
+                        <h4 data-toc-skip class="author">Paul Bailey,
+Ahmad Emad, Ting Zhang, Qingshu Xie</h4>
             
-            <h4 class="date">2021-05-20</h4>
+            <h4 data-toc-skip class="date">2023-08-18</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/American-Institutes-for-Research/wCorr/blob/master/vignettes/wCorrArguments.Rmd"><code>vignettes/wCorrArguments.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/American-Institutes-for-Research/wCorr/blob/HEAD/vignettes/wCorrArguments.Rmd" class="external-link"><code>vignettes/wCorrArguments.Rmd</code></a></small>
       <div class="hidden name"><code>wCorrArguments.Rmd</code></div>
 
     </div>
 
     
     
-<p>The wCorr package can be used to calculate Pearson, Spearman, polyserial, and polychoric correlations, in weighted or unweighted form.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> The package implements the tetrachoric correlation as a specific case of the polychoric correlation and biserial correlation as a specific case of the polyserial correlation. When weights are used, the correlation coefficients are calculated with so called sample weights or inverse probability weights.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
-<p>This vignette describes the use of applying two Boolean switches in the wCorr package. It describes the implications and uses simulation to show the impact of these switches on resulting correlation estimates.</p>
-<p>First, the Maximum Likelihood, or <code>ML</code> switch uses the Maximum Likelihood Estimator (MLE) when <code>ML=TRUE</code> or uses a consistent but non-MLE estimator for the nuisance parameters when <code>ML=FALSE</code>. The simulations show that using <code>ML=FALSE</code> is preferable because it speeds computation and decreases the root mean square error (RMSE) of the estimator.</p>
-<p>Second the <code>fast</code> argument gives the option to use a pure R implementation (<code>fast=FALSE</code>) or an implementation that relies on the <code>Rcpp</code> and <code>RcppArmadillo</code> packages (<code>fast=TRUE</code>). The simulations show agreement to within <span class="math inline">\(10^{-9}\)</span>, showing the implementations agree. At the same time the <code>fast=TRUE</code> option is always as fast or faster.</p>
-<p>In addition to this vignette, the <em>wCorr Formulas</em> vignette describes the statistical properties of the correlation estimators in the package and has a more complete derivation of the likelihood functions.</p>
-<div id="the-ml-switch" class="section level1">
-<h1 class="hasAnchor">
-<a href="#the-ml-switch" class="anchor"></a>The <code>ML</code> switch</h1>
-<p>The wCorr package computes correlation coefficients between two vectors of random variables that are jointly bivariate normal. We call the two vectors <strong><em>X</em></strong> and <strong><em>Y</em></strong>.</p>
-<p><span class="math display">\[\begin{pmatrix} X \\ Y \end{pmatrix} \sim N \left[ \begin{pmatrix} \mu_x \\ \mu_y \end{pmatrix}, \boldsymbol{\Sigma} \right] \]</span></p>
-<p>where <span class="math inline">\(N(\mathbf{A},\boldsymbol{\Sigma})\)</span> is the bivariate normal distribution with mean <strong><em>A</em></strong> and covariance <span class="math inline">\(\boldsymbol{\Sigma}\)</span>.</p>
-<div id="computation-of-polyserial-correlation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#computation-of-polyserial-correlation" class="anchor"></a>Computation of polyserial correlation</h2>
-<p>The likelihood function for an individual observation of the polyserial correlation is<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
-<p><span class="math display">\[\mathrm{Pr}\left( \rho=r, \boldsymbol{\Theta}=\boldsymbol{\theta} ; Z=z_i, M=m_i \right) = \phi(z_i) \left[ \Phi\left( \frac{\theta_{m_i+2} - r \cdot z_i}{\sqrt{1-r^2}} \right) - \Phi \left( \frac{\theta_{m_i+1} - r \cdot z_i}{\sqrt{1-r^2}} \right) \right]\]</span></p>
-<p>where <span class="math inline">\(\rho\)</span> is the correlation between <strong><em>X</em></strong> and <strong><em>Y</em></strong>, <strong><em>Z</em></strong> is the normalized version of <strong><em>X</em></strong>, and <strong><em>M</em></strong> is a discretized version of <strong><em>Y</em></strong>, using <span class="math inline">\(\boldsymbol{\theta}\)</span> as cut points as described in the <em>wCorr Formulas</em> vignette. Here an <em>i</em> is used to index the observed units.</p>
+<p>The wCorr package can be used to calculate Pearson, Spearman,
+polyserial, and polychoric correlations, in weighted or unweighted
+form.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
+The package implements the tetrachoric correlation as a specific case of
+the polychoric correlation and biserial correlation as a specific case
+of the polyserial correlation. When weights are used, the correlation
+coefficients are calculated with so called sample weights or inverse
+probability weights.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>This vignette describes the use of applying two Boolean switches in
+the wCorr package. It describes the implications and uses simulation to
+show the impact of these switches on resulting correlation
+estimates.</p>
+<p>First, the Maximum Likelihood, or <code>ML</code> switch uses the
+Maximum Likelihood Estimator (MLE) when <code>ML=TRUE</code> or uses a
+consistent but non-MLE estimator for the nuisance parameters when
+<code>ML=FALSE</code>. The simulations show that using
+<code>ML=FALSE</code> is preferable because it speeds computation and
+decreases the root mean square error (RMSE) of the estimator.</p>
+<p>Second the <code>fast</code> argument gives the option to use a pure
+R implementation (<code>fast=FALSE</code>) or an implementation that
+relies on the <code>Rcpp</code> and <code>RcppArmadillo</code> packages
+(<code>fast=TRUE</code>). The simulations show agreement to within <span class="math inline">\(10^{-9}\)</span>, showing the implementations
+agree. At the same time the <code>fast=TRUE</code> option is always as
+fast or faster.</p>
+<p>In addition to this vignette, the <em>wCorr Formulas</em> vignette
+describes the statistical properties of the correlation estimators in
+the package and has a more complete derivation of the likelihood
+functions.</p>
+<div class="section level2">
+<h2 id="the-ml-switch">The <code>ML</code> switch<a class="anchor" aria-label="anchor" href="#the-ml-switch"></a>
+</h2>
+<p>The wCorr package computes correlation coefficients between two
+vectors of random variables that are jointly bivariate normal. We call
+the two vectors <strong><em>X</em></strong> and
+<strong><em>Y</em></strong>.</p>
+<p><span class="math display">\[\begin{pmatrix} X \\ Y \end{pmatrix}
+\sim N \left[ \begin{pmatrix} \mu_x \\ \mu_y \end{pmatrix},
+\boldsymbol{\Sigma} \right] \]</span></p>
+<p>where <span class="math inline">\(N(\mathbf{A},\boldsymbol{\Sigma})\)</span> is the
+bivariate normal distribution with mean <strong><em>A</em></strong> and
+covariance <span class="math inline">\(\boldsymbol{\Sigma}\)</span>.</p>
+<div class="section level3">
+<h3 id="computation-of-polyserial-correlation">Computation of polyserial correlation<a class="anchor" aria-label="anchor" href="#computation-of-polyserial-correlation"></a>
+</h3>
+<p>The likelihood function for an individual observation of the
+polyserial correlation is<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<p><span class="math display">\[\mathrm{Pr}\left( \rho=r,
+\boldsymbol{\Theta}=\boldsymbol{\theta} ; Z=z_i, M=m_i \right) =
+\phi(z_i) \left[ \Phi\left( \frac{\theta_{m_i+2} - r \cdot
+z_i}{\sqrt{1-r^2}} \right) - \Phi \left( \frac{\theta_{m_i+1} - r \cdot
+z_i}{\sqrt{1-r^2}} \right) \right]\]</span></p>
+<p>where <span class="math inline">\(\rho\)</span> is the correlation
+between <strong><em>X</em></strong> and <strong><em>Y</em></strong>,
+<strong><em>Z</em></strong> is the normalized version of
+<strong><em>X</em></strong>, and <strong><em>M</em></strong> is a
+discretized version of <strong><em>Y</em></strong>, using <span class="math inline">\(\boldsymbol{\theta}\)</span> as cut points as
+described in the <em>wCorr Formulas</em> vignette. Here an <em>i</em> is
+used to index the observed units.</p>
 <p>The log-likelihood function (<span class="math inline">\(\ell\)</span>) is then</p>
-<p><span class="math display">\[\ell(\rho, \boldsymbol{\Theta}=\boldsymbol{\theta};\mathbf{Z}=\mathbf{z},\mathbf{M}=\mathbf{m}) = \sum_{i=1}^n w_i \ln\left[ \mathrm{Pr}\left( \rho=r, \boldsymbol{\Theta}=\boldsymbol{\theta} ; Z=z_i, M=m_i \right) \right]\]</span></p>
-<p>The derivatives of <span class="math inline">\(\ell\)</span> can be written down but are not readily computed. When the <code>ML</code> argument is set to <code>FALSE</code> (the default), the values of <span class="math inline">\(\boldsymbol{\theta}\)</span> are computed using a consistent estimator<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> and a one dimensional optimization of <span class="math inline">\(\rho\)</span> is calculated using the <code>optimize</code> function in the <code>stats</code> package. When the <code>ML</code> argument is set to <code>TRUE</code>, a multi-dimensional optimization is done for <span class="math inline">\(\rho\)</span> and <span class="math inline">\(\boldsymbol{\theta}\)</span> using the <code>bobyqa</code> function in the <code>minqa</code> package.</p>
+<p><span class="math display">\[\ell(\rho,
+\boldsymbol{\Theta}=\boldsymbol{\theta};\mathbf{Z}=\mathbf{z},\mathbf{M}=\mathbf{m})
+= \sum_{i=1}^n w_i \ln\left[ \mathrm{Pr}\left( \rho=r,
+\boldsymbol{\Theta}=\boldsymbol{\theta} ; Z=z_i, M=m_i \right)
+\right]\]</span></p>
+<p>The derivatives of <span class="math inline">\(\ell\)</span> can be
+written down but are not readily computed. When the <code>ML</code>
+argument is set to <code>FALSE</code> (the default), the values of <span class="math inline">\(\boldsymbol{\theta}\)</span> are computed using a
+consistent estimator<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> and a one dimensional optimization of <span class="math inline">\(\rho\)</span> is calculated using the
+<code>optimize</code> function in the <code>stats</code> package. When
+the <code>ML</code> argument is set to <code>TRUE</code>, a
+multi-dimensional optimization is done for <span class="math inline">\(\rho\)</span> and <span class="math inline">\(\boldsymbol{\theta}\)</span> using the
+<code>bobyqa</code> function in the <code>minqa</code> package.</p>
 </div>
-<div id="computation-of-polychoric-correlation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#computation-of-polychoric-correlation" class="anchor"></a>Computation of polychoric correlation</h2>
-<p>For the polychoric correlation the observed data is expressed in ordinal form for both variables. Here the discretized version of <strong><em>X</em></strong> is <strong><em>P</em></strong> and the discretized version of <strong><em>Y</em></strong> remains <strong><em>M</em></strong>.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> The likelihood function for the polychoric is</p>
-<p><span class="math display">\[\mathrm{Pr}\left( \rho=r, \boldsymbol{\Theta}=\boldsymbol{\theta}, \boldsymbol{\Theta}'=\boldsymbol{\theta}' ; P=p_i, M=m_i \right) = \int_{\theta_{p_i+1}'}^{\theta_{p_i+2}'}  \int_{\theta_{m_i+1}}^{\theta_{m_i+2}} \mkern-40mu  f(x,y|\rho=r) dy dx\]</span></p>
-<p>where <span class="math inline">\(f(x,y|r)\)</span> is the normalized bivariate normal distribution with correlation <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\boldsymbol{\theta}\)</span> are the cut points used to discretize <strong><em>Y</em></strong> into <strong><em>M</em></strong>, and <span class="math inline">\(\boldsymbol{\theta'}\)</span> are the cut points used to discretize <strong><em>X</em></strong> into <strong><em>P</em></strong>.</p>
-<p>The log-likelihood is then <span class="math display">\[\ell(\rho, \boldsymbol{\Theta}=\boldsymbol{\theta}, \boldsymbol{\Theta}'=\boldsymbol{\theta}' ;\mathbf{P}=\mathbf{p}, \mathbf{M}=\mathbf{m}) = \sum_{i=1}^n w_i \ln\left[\mathrm{Pr}\left( \rho=r, \boldsymbol{\Theta}=\boldsymbol{\theta},\boldsymbol{\Theta}'= \boldsymbol{\theta}' ; P=p_i, M=m_i \right) \right] \]</span></p>
-<p>The derivatives of <span class="math inline">\(\ell\)</span> can be written down but are not readily computed. When the <code>ML</code> argument is set to <code>FALSE</code> (the default), the values of <span class="math inline">\(\boldsymbol{\theta}\)</span> and <span class="math inline">\(\boldsymbol{\theta}'\)</span> are computed using a consistent estimator and a one dimensional optimization of <span class="math inline">\(\rho\)</span> is calculated using the <code>optimize</code> function in the <code>stats</code> package. When the <code>ML</code> argument is set to <code>TRUE</code>, a multi-dimensional optimization is done for <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\boldsymbol{\theta}\)</span>, <span class="math inline">\(\boldsymbol{\theta}'\)</span> using the <code>bobyqa</code> function in the <code>minqa</code> package.</p>
+<div class="section level3">
+<h3 id="computation-of-polychoric-correlation">Computation of polychoric correlation<a class="anchor" aria-label="anchor" href="#computation-of-polychoric-correlation"></a>
+</h3>
+<p>For the polychoric correlation the observed data is expressed in
+ordinal form for both variables. Here the discretized version of
+<strong><em>X</em></strong> is <strong><em>P</em></strong> and the
+discretized version of <strong><em>Y</em></strong> remains
+<strong><em>M</em></strong>.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> The likelihood function for the polychoric
+is</p>
+<p><span class="math display">\[\mathrm{Pr}\left( \rho=r,
+\boldsymbol{\Theta}=\boldsymbol{\theta},
+\boldsymbol{\Theta}'=\boldsymbol{\theta}' ; P=p_i, M=m_i \right)
+=
+\int_{\theta_{p_i+1}'}^{\theta_{p_i+2}'}  \int_{\theta_{m_i+1}}^{\theta_{m_i+2}}
+\mkern-40mu  f(x,y|\rho=r) dy dx\]</span></p>
+<p>where <span class="math inline">\(f(x,y|r)\)</span> is the normalized
+bivariate normal distribution with correlation <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\boldsymbol{\theta}\)</span> are the cut points
+used to discretize <strong><em>Y</em></strong> into
+<strong><em>M</em></strong>, and <span class="math inline">\(\boldsymbol{\theta'}\)</span> are the cut
+points used to discretize <strong><em>X</em></strong> into
+<strong><em>P</em></strong>.</p>
+<p>The log-likelihood is then <span class="math display">\[\ell(\rho,
+\boldsymbol{\Theta}=\boldsymbol{\theta},
+\boldsymbol{\Theta}'=\boldsymbol{\theta}'
+;\mathbf{P}=\mathbf{p}, \mathbf{M}=\mathbf{m}) = \sum_{i=1}^n w_i
+\ln\left[\mathrm{Pr}\left( \rho=r,
+\boldsymbol{\Theta}=\boldsymbol{\theta},\boldsymbol{\Theta}'=
+\boldsymbol{\theta}' ; P=p_i, M=m_i \right) \right] \]</span></p>
+<p>The derivatives of <span class="math inline">\(\ell\)</span> can be
+written down but are not readily computed. When the <code>ML</code>
+argument is set to <code>FALSE</code> (the default), the values of <span class="math inline">\(\boldsymbol{\theta}\)</span> and <span class="math inline">\(\boldsymbol{\theta}'\)</span> are computed
+using a consistent estimator and a one dimensional optimization of <span class="math inline">\(\rho\)</span> is calculated using the
+<code>optimize</code> function in the <code>stats</code> package. When
+the <code>ML</code> argument is set to <code>TRUE</code>, a
+multi-dimensional optimization is done for <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\boldsymbol{\theta}\)</span>, <span class="math inline">\(\boldsymbol{\theta}'\)</span> using the
+<code>bobyqa</code> function in the <code>minqa</code> package.</p>
 </div>
 </div>
-<div id="simulation-study" class="section level1">
-<h1 class="hasAnchor">
-<a href="#simulation-study" class="anchor"></a>Simulation study</h1>
-<p>To demonstrate the effect of the <code>ML</code> and <code>fast</code> switches a few simulation studies are performed to compare the similarity of the results when the switch is set to <code>TRUE</code> to the result when the switch is set to <code>FALSE</code>. This is done first for the <code>ML</code> switch and then for the <code>fast</code> switch.</p>
-<p>Finally, simulations show the implications of these switches on the speed of the computation.</p>
+<div class="section level2">
+<h2 id="simulation-study">Simulation study<a class="anchor" aria-label="anchor" href="#simulation-study"></a>
+</h2>
+<p>To demonstrate the effect of the <code>ML</code> and
+<code>fast</code> switches a few simulation studies are performed to
+compare the similarity of the results when the switch is set to
+<code>TRUE</code> to the result when the switch is set to
+<code>FALSE</code>. This is done first for the <code>ML</code> switch
+and then for the <code>fast</code> switch.</p>
+<p>Finally, simulations show the implications of these switches on the
+speed of the computation.</p>
 </div>
-<div id="general-procedures-of-the-simulation-study-of-unweighted-correlations" class="section level1">
-<h1 class="hasAnchor">
-<a href="#general-procedures-of-the-simulation-study-of-unweighted-correlations" class="anchor"></a>General procedures of the simulation study of unweighted correlations</h1>
-<p>A simulation is run several times.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> For each iteration, the following procedure is used:<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
+<div class="section level2">
+<h2 id="general-procedures-of-the-simulation-study-of-unweighted-correlations">General procedures of the simulation study of unweighted
+correlations<a class="anchor" aria-label="anchor" href="#general-procedures-of-the-simulation-study-of-unweighted-correlations"></a>
+</h2>
+<p>A simulation is run several times.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> For each iteration, the following procedure
+is used:<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
 <ul>
 <li>select a true correlation coefficient <span class="math inline">\(\rho\)</span>;</li>
 <li>select the number of observations <span class="math inline">\(n\)</span>;</li>
-<li>generate <strong><em>X</em></strong> and <strong><em>Y</em></strong> to be bivariate normally distributed using a pseudo-Random Number Generator (RNG);</li>
-<li>using a pseudo-RNG, select the number of bins for <strong><em>M</em></strong> and <strong><em>P</em></strong> (<span class="math inline">\(t\)</span> and <span class="math inline">\(t'\)</span>) independently from the set {2, 3, 4, 5};</li>
-<li>select the bin boundaries for <strong><em>M</em></strong> and <strong><em>P</em></strong> (<span class="math inline">\(\boldsymbol{\theta}\)</span> and <span class="math inline">\(\boldsymbol{\theta}'\)</span>) by sorting the results of <span class="math inline">\((t-1)\)</span> and <span class="math inline">\((t'-1)\)</span> draws, respectively, from a normal distribution using a pseudo-RNG;</li>
-<li>confirm that at least 2 levels of each of <strong><em>M</em></strong> and <strong><em>P</em></strong> are occupied (if not, return to the previous step); and</li>
+<li>generate <strong><em>X</em></strong> and <strong><em>Y</em></strong>
+to be bivariate normally distributed using a pseudo-Random Number
+Generator (RNG);</li>
+<li>using a pseudo-RNG, select the number of bins for
+<strong><em>M</em></strong> and <strong><em>P</em></strong> (<span class="math inline">\(t\)</span> and <span class="math inline">\(t'\)</span>) independently from the set {2, 3,
+4, 5};</li>
+<li>select the bin boundaries for <strong><em>M</em></strong> and
+<strong><em>P</em></strong> (<span class="math inline">\(\boldsymbol{\theta}\)</span> and <span class="math inline">\(\boldsymbol{\theta}'\)</span>) by sorting the
+results of <span class="math inline">\((t-1)\)</span> and <span class="math inline">\((t'-1)\)</span> draws, respectively, from a
+normal distribution using a pseudo-RNG;</li>
+<li>confirm that at least 2 levels of each of
+<strong><em>M</em></strong> and <strong><em>P</em></strong> are occupied
+(if not, return to the previous step); and</li>
 <li>calculate and record the correlation coefficients.</li>
 </ul>
-<p>One of a few possible statistics is then calculated. To compare two levels of a switch the Relative Mean Absolute Deviation is used</p>
-<p><span class="math display">\[RMAD= \frac{1}{m} \sum_{j=1}^m | r_{j, \mathtt{TRUE}} - r_{j, \mathtt{FALSE}} |  \]</span></p>
-<p>where there are <span class="math inline">\(m\)</span> simulations run, <span class="math inline">\(r_{j, \mathtt{TRUE}}\)</span> and <span class="math inline">\(r_{j, \mathtt{FALSE}}\)</span> are the estimated correlation coefficient for the <span class="math inline">\(j\)</span>th simulated dataset when the switch is set to <code>TRUE</code> and <code>FALSE</code>, respectively. This statistic is called “relative” because it is compared to the other method of computing the statistic, not the true value.</p>
-<p>To compare either level to the true correlation coefficient the Root Mean Square Error is used</p>
-<p><span class="math display">\[RMSE= \sqrt{ \frac{1}{m} \sum_{j=1}^m (r_j - \rho_j)^2 }   \]</span></p>
-<p>where, for the <span class="math inline">\(j\)</span>th simulated dataset, <span class="math inline">\(r_j\)</span> is an estimated correlation coefficient and <span class="math inline">\(\rho_j\)</span> is the value used to generate the data (<strong><em>X</em></strong>, <strong><em>Y</em></strong>, <strong><em>M</em></strong>, and <strong><em>P</em></strong>).</p>
+<p>One of a few possible statistics is then calculated. To compare two
+levels of a switch the Relative Mean Absolute Deviation is used</p>
+<p><span class="math display">\[RMAD= \frac{1}{m} \sum_{j=1}^m | r_{j,
+\mathtt{TRUE}} - r_{j, \mathtt{FALSE}} |  \]</span></p>
+<p>where there are <span class="math inline">\(m\)</span> simulations
+run, <span class="math inline">\(r_{j, \mathtt{TRUE}}\)</span> and <span class="math inline">\(r_{j, \mathtt{FALSE}}\)</span> are the estimated
+correlation coefficient for the <span class="math inline">\(j\)</span>th
+simulated dataset when the switch is set to <code>TRUE</code> and
+<code>FALSE</code>, respectively. This statistic is called “relative”
+because it is compared to the other method of computing the statistic,
+not the true value.</p>
+<p>To compare either level to the true correlation coefficient the Root
+Mean Square Error is used</p>
+<p><span class="math display">\[RMSE= \sqrt{ \frac{1}{m} \sum_{j=1}^m
+(r_j - \rho_j)^2 }   \]</span></p>
+<p>where, for the <span class="math inline">\(j\)</span>th simulated
+dataset, <span class="math inline">\(r_j\)</span> is an estimated
+correlation coefficient and <span class="math inline">\(\rho_j\)</span>
+is the value used to generate the data (<strong><em>X</em></strong>,
+<strong><em>Y</em></strong>, <strong><em>M</em></strong>, and
+<strong><em>P</em></strong>).</p>
 </div>
-<div id="ml-switch" class="section level1">
-<h1 class="hasAnchor">
-<a href="#ml-switch" class="anchor"></a>ML switch</h1>
-<p>A simulation was done using the Cartesian product (all possible combinations of) <span class="math inline">\(\mathtt{ML} \in \{\mathtt{TRUE}, \mathtt{FALSE} \}\)</span>, <span class="math inline">\(\rho \in \left( -0.99, -0.95, -0.90, -0.85, ..., 0.95, 0.99 \right)\)</span>, and <span class="math inline">\(n \in \{10, 100, 1000\}\)</span>. Each iteration is run three times to increase the precision of the simulation. The same values of the variables are used in the computation for <code>ML=TRUE</code> as well as for <code>ML=FALSE</code>; and then the statistics are compared between the two sets of results (e.g. <code>ML=TRUE</code> and <code>ML=FALSE</code>).</p>
+<div class="section level2">
+<h2 id="ml-switch">ML switch<a class="anchor" aria-label="anchor" href="#ml-switch"></a>
+</h2>
+<p>A simulation was done using the Cartesian product (all possible
+combinations of) <span class="math inline">\(\mathtt{ML} \in
+\{\mathtt{TRUE}, \mathtt{FALSE} \}\)</span>, <span class="math inline">\(\rho \in \left( -0.99, -0.95, -0.90, -0.85, ...,
+0.95, 0.99 \right)\)</span>, and <span class="math inline">\(n \in \{10,
+100, 1000\}\)</span>. Each iteration is run three times to increase the
+precision of the simulation. The same values of the variables are used
+in the computation for <code>ML=TRUE</code> as well as for
+<code>ML=FALSE</code>; and then the statistics are compared between the
+two sets of results (e.g. <code>ML=TRUE</code> and
+<code>ML=FALSE</code>).</p>
 <div style="page-break-after: always;"></div>
-<p><strong>Figure 1.</strong> <em>Root Mean Square Error for <code>ML=TRUE</code> and <code>ML=FALSE</code>.</em><br><img src="wCorrArguments_files/figure-html/ML%20RMSE%20plot-1.png" width="672"></p>
-<p>The RMSE for these two options is so similar that the two lines cannot be distinguished for most of the plot. The exact differences are shown for Polychoric in Table 1 and for Polyserial in Table 2. The column labeled, “RMSE difference” shows how much larger the RMSE is for <code>ML=TRUE</code> than <code>ML=FALSE</code>. Because this difference is always positive the RMSE of the <code>ML=FALSE</code> option is always lower. Because of this the <code>ML=TRUE</code> option is preferable only in situations where there is a reason to prefer MLE for some other reason.</p>
+<p><strong>Figure 1 :.</strong> <em>Root Mean Square Error for
+<code>ML=TRUE</code> and <code>ML=FALSE</code>.</em><br><img src="wCorrArguments_files/figure-html/MLRMSEplot-1.png" width="672"></p>
+<p>The RMSE for these two options is so similar that the two lines
+cannot be distinguished for most of the plot. The exact differences are
+shown for Polychoric in Table 1 : and for Polyserial in Table 2 :. The
+column labeled, “RMSE difference” shows how much larger the RMSE is for
+<code>ML=TRUE</code> than <code>ML=FALSE</code>. Because this difference
+is always positive the RMSE of the <code>ML=FALSE</code> option is
+always lower. Because of this the <code>ML=TRUE</code> option is
+preferable only in situations where there is a reason to prefer MLE for
+some other reason.</p>
 <p> </p>
-<p><strong>Table 1.</strong> <em>Relative Mean Absolute Deviation between <code>ML=TRUE</code> and <code>ML=FALSE</code> for Polychoric.</em></p>
+<p><strong>Table 1 :.</strong> <em>Relative Mean Absolute Deviation
+between <code>ML=TRUE</code> and <code>ML=FALSE</code> for
+Polychoric.</em></p>
 <table class="table">
+<colgroup>
+<col width="23%">
+<col width="6%">
+<col width="18%">
+<col width="19%">
+<col width="22%">
+<col width="9%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">Correlation type</th>
 <th align="right">n</th>
@@ -197,8 +334,18 @@
 </tbody>
 </table>
 <p> </p>
-<p><strong>Table 2.</strong> <em>Relative Mean Absolute Deviation between <code>ML=TRUE</code> and <code>ML=FALSE</code> for Polyserial.</em></p>
+<p><strong>Table 2 :.</strong> <em>Relative Mean Absolute Deviation
+between <code>ML=TRUE</code> and <code>ML=FALSE</code> for
+Polyserial.</em></p>
 <table class="table">
+<colgroup>
+<col width="23%">
+<col width="6%">
+<col width="18%">
+<col width="19%">
+<col width="22%">
+<col width="9%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">Correlation type</th>
 <th align="right">n</th>
@@ -234,44 +381,133 @@
 </tr>
 </tbody>
 </table>
-<p>For the Polychoric, the agreement between these two methods, in terms of MSE is within 0.001 for <span class="math inline">\(n\)</span> of 10 and decreases to within less than 0.0000 for <span class="math inline">\(n\)</span> of 100 or more. Given the magnitude of these differences the faster method will be preferable.</p>
-<p>The final column in the above tables shows the RMAD which compares how similar the <code>ML=TRUE</code> and <code>ML=FALSE</code> results are to each other. Because these values are larger than 0, they indicate that there is not complete agreement between the two sets of estimates. If a user considers the MLE to be the correct estimate then they show the deviation of the <code>ML=FALSE</code> results from the correct results.</p>
+<p>For the Polychoric, the agreement between these two methods, in terms
+of MSE is within 0.001 for <span class="math inline">\(n\)</span> of 10
+and decreases to within less than 0.0000 for <span class="math inline">\(n\)</span> of 100 or more. Given the magnitude of
+these differences the faster method will be preferable.</p>
+<p>The final column in the above tables shows the RMAD which compares
+how similar the <code>ML=TRUE</code> and <code>ML=FALSE</code> results
+are to each other. Because these values are larger than 0, they indicate
+that there is not complete agreement between the two sets of estimates.
+If a user considers the MLE to be the correct estimate then they show
+the deviation of the <code>ML=FALSE</code> results from the correct
+results.</p>
 </div>
-<div id="fast-switch" class="section level1">
-<h1 class="hasAnchor">
-<a href="#fast-switch" class="anchor"></a>fast switch</h1>
-<p>This section examines the agreement between the pure R implementation of the function that calculates the correlation and the <code>Rcpp</code> and <code>RcppArmadillo</code> implementation, which is expected to be faster. The code can compute with either option by setting <code>fast=FALSE</code> (pure R) or <code>fast=TRUE</code> (Rcpp).</p>
-<p>A simulation was done at each level of the Cartesian product of <span class="math inline">\(\mathtt{fast} \in \{\mathtt{TRUE}, \mathtt{FALSE} \}\)</span>, <span class="math inline">\(\rho \in \left( -0.99, -0.95, -0.90, -0.85, ..., 0.95, 0.99 \right)\)</span>, and <span class="math inline">\(n \in \{10, 100, 1000\}\)</span>. Each iteration was run 100 times. The same values of the variables are used in the computation for <code>fast=TRUE</code> as well as for <code>fast=FALSE</code>; and then the statistics are compared between the two sets of results.</p>
-<p>The plot below shows all differences between the <code>fast=TRUE</code> and <code>fast=FALSE runs</code> for the four types of correlations. Note that differences smaller than <span class="math inline">\(10^{-16}\)</span> are indistinguishable from 0 by the machine. Because of this, all values were shown as being at least <span class="math inline">\(10^{-16}\)</span> so that they could all be shown on a log scale.</p>
+<div class="section level2">
+<h2 id="fast-switch">fast switch<a class="anchor" aria-label="anchor" href="#fast-switch"></a>
+</h2>
+<p>This section examines the agreement between the pure R implementation
+of the function that calculates the correlation and the
+<code>Rcpp</code> and <code>RcppArmadillo</code> implementation, which
+is expected to be faster. The code can compute with either option by
+setting <code>fast=FALSE</code> (pure R) or <code>fast=TRUE</code>
+(Rcpp).</p>
+<p>A simulation was done at each level of the Cartesian product of <span class="math inline">\(\mathtt{fast} \in \{\mathtt{TRUE}, \mathtt{FALSE}
+\}\)</span>, <span class="math inline">\(\rho \in \left( -0.99, -0.95,
+-0.90, -0.85, ..., 0.95, 0.99 \right)\)</span>, and <span class="math inline">\(n \in \{10, 100, 1000\}\)</span>. Each iteration
+was run 100 times. The same values of the variables are used in the
+computation for <code>fast=TRUE</code> as well as for
+<code>fast=FALSE</code>; and then the statistics are compared between
+the two sets of results.</p>
+<p>The plot below shows all differences between the
+<code>fast=TRUE</code> and <code>fast=FALSE runs</code> for the four
+types of correlations. Note that differences smaller than <span class="math inline">\(10^{-16}\)</span> are indistinguishable from 0 by
+the machine. Because of this, all values were shown as being at least
+<span class="math inline">\(10^{-16}\)</span> so that they could all be
+shown on a log scale.</p>
 <p> </p>
-<p><strong>Figure 2.</strong> <em>Relative Mean Absolute Differences between <code>fast=TRUE</code> and <code>fast=FALSE</code>.</em><br><img src="wCorrArguments_files/figure-html/fast%20MAD%20plot-1.png" width="672"></p>
-<p>The above shows that differences as a result of the <code>fast</code> argument are never expected to be larger than <span class="math inline">\(10^{-9}\)</span> for any type or correlation type. The Spearman never shows any difference that is different from zero and the Pearson show differences just larger than the smallest observable difference when using double precision floating point values (about <span class="math inline">\(1 \times 10^{-16}\)</span>). This indicates that the computation differences are completely irrelevant for these two types.</p>
-<p>For the other two types, it is unclear which one is correct and the agreement that is never more distant than the <span class="math inline">\(10^{-9}\)</span> level indicates that any use that requires precision of less than <span class="math inline">\(10^{-9}\)</span> can use the <code>fast=TRUE</code> argument for faster computation.</p>
+<p><strong>Figure 2 :.</strong> <em>Relative Mean Absolute Differences
+between <code>fast=TRUE</code> and <code>fast=FALSE</code>.</em><br><img src="wCorrArguments_files/figure-html/fast%20MAD%20plot-1.png" width="672"></p>
+<p>The above shows that differences as a result of the <code>fast</code>
+argument are never expected to be larger than <span class="math inline">\(10^{-9}\)</span> for any type or correlation type.
+The Spearman never shows any difference that is different from zero and
+the Pearson show differences just larger than the smallest observable
+difference when using double precision floating point values (about
+<span class="math inline">\(1 \times 10^{-16}\)</span>). This indicates
+that the computation differences are completely irrelevant for these two
+types.</p>
+<p>For the other two types, it is unclear which one is correct and the
+agreement that is never more distant than the <span class="math inline">\(10^{-9}\)</span> level indicates that any use that
+requires precision of less than <span class="math inline">\(10^{-9}\)</span> can use the
+<code>fast=TRUE</code> argument for faster computation.</p>
 </div>
-<div id="implications-for-speed" class="section level1">
-<h1 class="hasAnchor">
-<a href="#implications-for-speed" class="anchor"></a>Implications for speed</h1>
-<p>To show the effect of the <code>ML</code> and <code>fast</code> switches on computation a simulation was done at each level of the Cartesian product of <span class="math inline">\(\mathtt{ML} \in \{\mathtt{TRUE}, \mathtt{FALSE} \}\)</span>, <span class="math inline">\(\mathtt{fast} \in \{\mathtt{TRUE}, \mathtt{FALSE} \}\)</span>, <span class="math inline">\(\rho \in \left( -0.99, -0.95, -0.90, -0.85, ..., 0.95, 0.99 \right)\)</span>, and <span class="math inline">\(n \in \{10^1, 10^{1.25}, 10^{1.5}, ..., 10^7\}\)</span>. Each iteration is run 80 times when <span class="math inline">\(n&lt;10^5\)</span> and 20 times when <span class="math inline">\(n\geq 10^5\)</span>. The same values of the variables are used in the computations at all four combinations of <code>ML</code> and <code>fast</code>. A variety of correlations are chosen so that the results represent an average of possible values of <span class="math inline">\(\rho\)</span>.</p>
-<p>The following plot shows the mean computing time (in seconds) versus <span class="math inline">\(n\)</span>.</p>
+<div class="section level2">
+<h2 id="implications-for-speed">Implications for speed<a class="anchor" aria-label="anchor" href="#implications-for-speed"></a>
+</h2>
+<p>To show the effect of the <code>ML</code> and <code>fast</code>
+switches on computation a simulation was done at each level of the
+Cartesian product of <span class="math inline">\(\mathtt{ML} \in
+\{\mathtt{TRUE}, \mathtt{FALSE} \}\)</span>, <span class="math inline">\(\mathtt{fast} \in \{\mathtt{TRUE}, \mathtt{FALSE}
+\}\)</span>, <span class="math inline">\(\rho \in \left( -0.99, -0.95,
+-0.90, -0.85, ..., 0.95, 0.99 \right)\)</span>, and <span class="math inline">\(n \in \{10^1, 10^{1.25}, 10^{1.5}, ...,
+10^7\}\)</span>. Each iteration is run 80 times when <span class="math inline">\(n&lt;10^5\)</span> and 20 times when <span class="math inline">\(n\geq 10^5\)</span>. The same values of the
+variables are used in the computations at all four combinations of
+<code>ML</code> and <code>fast</code>. A variety of correlations are
+chosen so that the results represent an average of possible values of
+<span class="math inline">\(\rho\)</span>.</p>
+<p>The following plot shows the mean computing time (in seconds) versus
+<span class="math inline">\(n\)</span>.</p>
 <p> </p>
-<p><strong>Figure 3.</strong> <em>Computation time comparison.</em><br><img src="wCorrArguments_files/figure-html/plot%20speed-1.png" width="672"></p>
-<p>In all cases setting the <code>ML</code> option to <code>FALSE</code> and the <code>fast</code> option to <code>TRUE</code> speeds up–or does not slow down computation. Users wishing for the fastest computation speeds will use <code>ML=FALSE</code> and <code>fast=TRUE</code>.</p>
-<p>For the Polychoric, when <span class="math inline">\(n\)</span> is a million observations (<span class="math inline">\(n=10^7\)</span>), the speed of a correlation when <code>fast=FALSE</code> is 761 seconds and when the <code>fast=TRUE</code> it is and 8 seconds. When <code>fast=TRUE</code>, setting <code>ML=FALSE</code> speeds computation by 3 seconds.</p>
-<p>For the Polyserial, when <span class="math inline">\(n\)</span> is a million observations, the speed of a correlation when <code>ML=TRUE</code> is 652 seconds and when the <code>ML=FALSE</code> it is and 77 seconds. When <code>ML=FALSE</code>, setting <code>fast=TRUE</code> speeds computation by 24 seconds.</p>
-<p>#Conclusion Overall the simulations show that the <code>ML</code> option is not more accurate but does add computation burden.</p>
-<p>The <code>fast=TRUE</code> and <code>fast=FALSE</code> option are a <code>Rcpp</code> version of the correlation code and an <code>R</code> version, respectively and agree with each other–the differences are not expected to be larger than <span class="math inline">\(10^{-9}\)</span>.</p>
-<p>Thus users wishing for fastest computation speeds and accurate results can use <code>ML=FALSE</code> and <code>fast=TRUE</code>.</p>
+<p><strong>Figure 3 :.</strong> <em>Computation time
+comparison.</em><br><img src="wCorrArguments_files/figure-html/plot%20speed-1.png" width="672"></p>
+<p>In all cases setting the <code>ML</code> option to <code>FALSE</code>
+and the <code>fast</code> option to <code>TRUE</code> speeds up–or does
+not slow down computation. Users wishing for the fastest computation
+speeds will use <code>ML=FALSE</code> and <code>fast=TRUE</code>.</p>
+<p>For the Polychoric, when <span class="math inline">\(n\)</span> is a
+million observations (<span class="math inline">\(n=10^7\)</span>), the
+speed of a correlation when <code>fast=FALSE</code> is 761 seconds and
+when the <code>fast=TRUE</code> it is and 8 seconds. When
+<code>fast=TRUE</code>, setting <code>ML=FALSE</code> speeds computation
+by 3 seconds.</p>
+<p>For the Polyserial, when <span class="math inline">\(n\)</span> is a
+million observations, the speed of a correlation when
+<code>ML=TRUE</code> is 652 seconds and when the <code>ML=FALSE</code>
+it is and 77 seconds. When <code>ML=FALSE</code>, setting
+<code>fast=TRUE</code> speeds computation by 24 seconds.</p>
+<p>#Conclusion Overall the simulations show that the <code>ML</code>
+option is not more accurate but does add computation burden.</p>
+<p>The <code>fast=TRUE</code> and <code>fast=FALSE</code> option are a
+<code>Rcpp</code> version of the correlation code and an <code>R</code>
+version, respectively and agree with each other–the differences are not
+expected to be larger than <span class="math inline">\(10^{-9}\)</span>.</p>
+<p>Thus users wishing for fastest computation speeds and accurate
+results can use <code>ML=FALSE</code> and <code>fast=TRUE</code>.</p>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr>
 <ol>
-<li id="fn1"><p>The estimation procedure used by the wCorr package for the polyserial is based on the likelihood function in by Cox, N. R. (1974), “Estimation of the Correlation between a Continuous and a Discrete Variable.” <em>Biometrics</em>, <strong>30</strong> (1), pp 171-178. The likelihood function for polychoric is from Olsson, U. (1979) “Maximum Likelihood Estimation of the Polychoric Correlation Coefficient.” <em>Psyhometrika</em>, <strong>44</strong> (4), pp 443-460. The likelihood used for Pearson and Spearman is written down many places. One is the “correlate” function in Stata Corp, Stata Statistical Software: Release 8. College Station, TX: Stata Corp LP, 2003.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>Sample weights are comparable to <code>pweight</code> in Stata.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>See the <em>wCorr Formulas</em> vignette for a more complete description of the polyserial correlations’ likelihood function.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>The value of the nuisance parameter <span class="math inline">\(\boldsymbol{\theta}\)</span> is chosen to be <span class="math inline">\(\Phi^{-1}(n/N)\)</span> where <span class="math inline">\(n\)</span> is the number of values to the left of the cut point (<span class="math inline">\(\theta_i\)</span> value) and <span class="math inline">\(N\)</span> is the number of data points overall. For the weighted cause <span class="math inline">\(n\)</span> is replaced by the sum of the weights to the left of the cut point and <span class="math inline">\(N\)</span> is replaced by the total weight of all units. See the <strong>wCorr Formulas</strong> vignette for a more complete description.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>See the “wCorr Formulas” vignette for a more complete description of the polychoric correlations’ likelihood function.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
-<li id="fn6"><p>The exact number is noted for each specific simulation.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
-<li id="fn7"><p>When the exact method of selecting a parameter (such as <span class="math inline">\(n\)</span>) is not noted above, it is described as part of each simulation.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>The estimation procedure used by the wCorr package for
+the polyserial is based on the likelihood function in by Cox, N. R.
+(1974), “Estimation of the Correlation between a Continuous and a
+Discrete Variable.” <em>Biometrics</em>, <strong>30</strong> (1), pp
+171-178. The likelihood function for polychoric is from Olsson, U.
+(1979) “Maximum Likelihood Estimation of the Polychoric Correlation
+Coefficient.” <em>Psyhometrika</em>, <strong>44</strong> (4), pp
+443-460. The likelihood used for Pearson and Spearman is written down
+many places. One is the “correlate” function in Stata Corp, Stata
+Statistical Software: Release 8. College Station, TX: Stata Corp LP,
+2003.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Sample weights are comparable to <code>pweight</code> in
+Stata.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>See the <em>wCorr Formulas</em> vignette for a more
+complete description of the polyserial correlations’ likelihood
+function.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>The value of the nuisance parameter <span class="math inline">\(\boldsymbol{\theta}\)</span> is chosen to be <span class="math inline">\(\Phi^{-1}(n/N)\)</span> where <span class="math inline">\(n\)</span> is the number of values to the left of
+the cut point (<span class="math inline">\(\theta_i\)</span> value) and
+<span class="math inline">\(N\)</span> is the number of data points
+overall. For the weighted cause <span class="math inline">\(n\)</span>
+is replaced by the sum of the weights to the left of the cut point and
+<span class="math inline">\(N\)</span> is replaced by the total weight
+of all units. See the <strong>wCorr Formulas</strong> vignette for a
+more complete description.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>See the “wCorr Formulas” vignette for a more complete
+description of the polychoric correlations’ likelihood function.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>The exact number is noted for each specific
+simulation.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>When the exact method of selecting a parameter (such as
+<span class="math inline">\(n\)</span>) is not noted above, it is
+described as part of each simulation.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>
@@ -287,11 +523,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Paul Bailey, Ahmad Emad.</p>
+  <p></p>
+<p>Developed by Paul Bailey, Ahmad Emad.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -299,6 +537,8 @@
 
   
 
+
+  
 
   </body>
 </html>

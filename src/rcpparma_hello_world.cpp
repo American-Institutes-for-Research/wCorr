@@ -1,6 +1,7 @@
 // -*- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 
 // we only include RcppArmadillo.h which pulls Rcpp.h in for us
+#define STRICT_R_HEADERS
 #include "RcppArmadillo.h"
 
 // via the depends attribute we tell Rcpp to create hooks for
@@ -18,7 +19,7 @@
 arma::mat rcpparma_hello_world() {
     arma::mat m1 = arma::eye<arma::mat>(3, 3);
     arma::mat m2 = arma::eye<arma::mat>(3, 3);
-	                     
+                         
     return m1 + 3 * (m1 + m2);
 }
 
