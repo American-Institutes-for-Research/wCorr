@@ -13,6 +13,12 @@ vignette: |
 
 ```{r packages and data, echo=FALSE, results="hide", message=FALSE, warning=FALSE}
 require(wCorr)
+if(!requireNamespace("doBy")) {
+  stop("Cannot build vignette without knitr package")
+}
+if(!requireNamespace("lattice")) {
+  stop("Cannot build vignette without lattice package")
+}
 require(lattice)
 require(doBy)
 # set layout so a figure label appears to go with the figure
